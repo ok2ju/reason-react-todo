@@ -1,30 +1,5 @@
-type item = {
-  id: int,
-  title: string,
-  completed: bool
-};
-
-module TodoItem = {
-  let component = ReasonReact.statelessComponent("TodoItem");
-  let make = (~item, ~onToggle, _) => {
-    ...component,
-
-    render: _ =>
-      <div
-        className="item"
-        onClick=(_ => onToggle())
-      >
-        <input
-          type_="checkbox"
-          checked=(item.completed)
-        />
-        (ReasonReact.string(item.title))
-      </div>
-  };
-};
-
 type state = {
-  items: list(item)
+  items: list(Records.item)
 };
 
 type action =
@@ -35,21 +10,15 @@ let component = ReasonReact.reducerComponent("TodoApp");
 
 let lastId = ref(0);
 
-let newItem = () => {
+let newItem = (): Records.item => {
   lastId := lastId^ + 1;
   { id: lastId^, title: "Click a button", completed: true };
 };
 
-let toggleItem = (items, id) =>
-  List.map(
-    item => item.id === id ? { ...item, completed: !item.completed } : item,
-    items
-  );
-
 let make = (_) => {
   ...component,
 
-  initialState: () => {
+  initialState: (): state => {
     items: [
       { id: 0, title: "Write some things to do", completed: false }
     ]
@@ -60,7 +29,7 @@ let make = (_) => {
     | AddItem => ReasonReact.Update({ items: [newItem(), ...items] })
     | ToggleItem(id) =>
       let items = List.map(
-        item =>
+        (item: Records.item) =>
           item.id === id ? { ...item, completed: !item.completed } : item,
         items
       );
@@ -83,7 +52,7 @@ let make = (_) => {
         (ReasonReact.array(
           Array.of_list(
             List.map(
-              item =>
+              (item: Records.item) =>
                 <TodoItem
                   key=(string_of_int(item.id))
                   onToggle=(_ => self.send(ToggleItem(item.id)))
