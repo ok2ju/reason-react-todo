@@ -1,6 +1,6 @@
 let component = ReasonReact.statelessComponent("TodoItem");
 
-let make = (~item: Records.item, ~onToggle, _) => {
+let make = (~item: SharedTypes.item, ~onToggle, _) => {
   ...component,
 
   render: _ =>

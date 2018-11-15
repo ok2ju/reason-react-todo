@@ -1,5 +1,5 @@
 type state = {
-  items: list(Records.item)
+  items: list(SharedTypes.item)
 };
 
 type action =
@@ -10,7 +10,7 @@ let component = ReasonReact.reducerComponent("TodoApp");
 
 let lastId = ref(0);
 
-let newItem = (): Records.item => {
+let newItem = (): SharedTypes.item => {
   lastId := lastId^ + 1;
   { id: lastId^, title: "Click a button", completed: true };
 };
@@ -29,7 +29,7 @@ let make = (_) => {
     | AddItem => ReasonReact.Update({ items: [newItem(), ...items] })
     | ToggleItem(id) =>
       let items = List.map(
-        (item: Records.item) =>
+        (item: SharedTypes.item) =>
           item.id === id ? { ...item, completed: !item.completed } : item,
         items
       );
@@ -49,19 +49,18 @@ let make = (_) => {
         </button>
       </div>
       <div className="items">
-        (ReasonReact.array(
-          Array.of_list(
-            List.map(
-              (item: Records.item) =>
-                <TodoItem
-                  key=(string_of_int(item.id))
-                  onToggle=(_ => self.send(ToggleItem(item.id)))
-                  item
-                />,
-              items
+        (
+          items
+          |> List.map((item: SharedTypes.item) =>
+              <TodoItem
+                key=(string_of_int(item.id))
+                onToggle=(_ => self.send(ToggleItem(item.id)))
+                item
+              />
             )
-          )
-        ))
+          |> Array.of_list
+          |> ReasonReact.array
+        )
       </div>
       <div>
         (ReasonReact.string(string_of_int(numItems) ++ " items"))
