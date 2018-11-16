@@ -6,3 +6,4 @@ coverage/
 lib/
 .merlin
 .bsb.lock
+/build
